@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\model",
+    "\\src\\model\\question",
+    "\\src\\model\\user",
+    "\\src\\presenter",
+    "\\src\\rest",
+    "\\src\\view"
+  ],
+  "SelectedNode": "\\src\\presenter\\questionsListPresenter.js",
+  "PreviewInSolutionExplorer": false
+}
