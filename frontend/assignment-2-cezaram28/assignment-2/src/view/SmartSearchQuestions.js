@@ -5,9 +5,10 @@ import SearchQuestions from "./SearchQuestions";
 import questionsListPresenter from "../presenter/questionsListPresenter";
 
 const mapQuestionStateToComponentState = state => ({
-    questions: state.questionState.newQuestion.title === "" ?
-        (state.questionState.newQuestion.tags === "" ? state.questionState.questions : questionSelector.findByTag(state.questionState.newQuestion.tags)) :
-        questionSelector.findByTitle(state.questionState.newQuestion.title),
+   // questions: state.questionState.newQuestion.title === "" ?
+   //     (state.questionState.newQuestion.tags === "" ? state.questionState.questions : state.questionState.searchedQuestions) :
+   //     state.questionState.searchedQuestions,
+    questions: state.questionState.searchedQuestions,
     user: state.userState.users[state.userState.currentUserIndex]
 });
 

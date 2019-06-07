@@ -9,6 +9,7 @@ public interface UserRepository {
     List<User> findAll();
     User save(User user);
     void remove(User user);
+    void deleteAll();
     Optional<User> findById(int id);
     Optional<User> findByName(String username);
     Optional<User> findByCredentials(String username, String password);

@@ -25,6 +25,11 @@ public class JdbcQuestionRepository implements QuestionRepository {
     }
 
     @Override
+    public void deleteAll() {
+        template.update("DELETE FROM question");
+    }
+
+    @Override
     public Optional<List<Question>> findUsersAll(int userId) {
         List<Question> questions = template.query("SELECT * FROM question WHERE author_id = ?", new QuestionMapper(), userId);
         for(Question q : questions) {

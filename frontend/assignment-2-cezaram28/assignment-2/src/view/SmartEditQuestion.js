@@ -2,9 +2,10 @@ import React, { Component } from "react";
 import editQuestionPresenter from "../presenter/editQuestionPresenter";
 import EditQuestion from "./EditQuestion";
 import { connect } from "react-redux";
+import { findById } from "../model/question/questionSelectors";
 
 const mapQuestionStateToComponentState = (state, props) => ({
-    question: state.questionState.questions[props.match.params.index],
+    question: findById(props.match.params.index),
     user: state.userState.users[state.userState.currentUserIndex],
     title: state.questionState.newQuestion.title,
     text: state.questionState.newQuestion.text

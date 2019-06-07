@@ -17,6 +17,11 @@ public class JdbcTagRepository implements TagRepository {
     private final JdbcTemplate template;
 
     @Override
+    public void deleteAll() {
+        template.update("DELETE FROM tag");
+    }
+
+    @Override
     public List<Tag> findAll() {
         return template.query("SELECT * FROM tag", ((resultSet, i) -> new Tag(resultSet.getInt("id"), resultSet.getString("name"))));
     }

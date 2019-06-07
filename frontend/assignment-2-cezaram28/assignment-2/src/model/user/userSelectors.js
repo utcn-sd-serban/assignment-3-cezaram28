@@ -12,10 +12,6 @@ export function getNewUser() {
     return store.getState().userState.newUser;
 }
 
-export function getCurrentIndex() {
-    return store.getState().userState.currentUserIndex;
-}
-
 export function getIndex() {
     return store.getState().userState.index;
 }

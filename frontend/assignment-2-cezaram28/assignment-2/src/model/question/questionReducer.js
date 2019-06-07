@@ -1,56 +1,16 @@
 const initState = {
-    questions: [{
-        id: 0,
-        title: "it's a title",
-        author: {
-            id: 0,
-            username: "mckfchicken",
-            password: "burgr",
-            email: "mckfc@subway.com",
-            score: 5,
-            isAdmin: false,
-            isBanned: false
-        },
-        text: "some text",
-        creationDate: "some date",
-        voteCount: 5,
-        tags: [{
-            id: 0,
-            name: "java"
-        }]
-    }, {
-        id: 1,
-        title: "my question is",
-            author: {
-                id: 0,
-                username: "mckfchicken",
-                password: "burgr",
-                email: "mckfc@subway.com",
-                score: 5,
-                isAdmin: false,
-                isBanned: false
-            },
-        text: "this",
-        creationDate: "some date",
-        voteCount: 1,
-        tags: [{
-            id: 0,
-            name: "java"
-        }, {
-            id: 1,
-            name: "programming"
-        }]
-    }],
+    questions: [],
     newQuestion: {
         id: "",
         title: "",
         author: "",
         text: "",
-        creationDate: "some date",
+        creationDate: "",
         voteCount: "",
         tags: ""
     },
-    index: 2
+    searchedQuestions: [],
+    index: 0
 };
 
 export default function questionReducer(state = initState, action) {
@@ -67,6 +27,10 @@ export default function questionReducer(state = initState, action) {
             return changeNewQuestionProperty(state, action.payload);
         case "LOAD_QUESTIONS":
             return loadQuestions(state, action.payload);
+        case "SEARCH_QUESTIONS":
+            return searchQuestions(state, action.payload);
+        case "UPDATE_QUESTION":
+            return updateQuestion(state, action.payload);
     }
     return state;
 }
@@ -74,30 +38,43 @@ export default function questionReducer(state = initState, action) {
 function addQuestion(state, payload) {
     return {
         ...state,
-        questions: state.questions.concat([{
-            id: payload.id,
-            title: payload.title,
-            author: payload.user,
-            text: payload.text,
-            creationDate: payload.creationDate,
-            voteCount: payload.voteCount,
-            tags: payload.tags
-        }])
+        questions: state.questions.concat([payload.question])
     };
 }
 
 function editQuestion(state, payload) {
+    let question = state.questions.filter(q => q.id == payload.id)[0];
     let currentQuestion = {
         id: payload.id,
         title: payload.title,
-        author: state.questions[payload.id].author,
+        author: question.author,
         text: payload.text,
-        creationDate: state.questions[payload.id].creationDate,
-        voteCount: state.questions[payload.id].voteCount,
-        tags: state.questions[payload.id].tags
+        creationDate: question.creationDate,
+        voteCount: question.voteCount,
+        tags: question.tags
     };
     let allQuestions = state.questions.concat([]);
-    allQuestions[payload.id] = currentQuestion;
+    allQuestions[allQuestions.indexOf(question)] = currentQuestion;
+    return {
+        ...state,
+        questions: allQuestions
+    };
+}
+
+function updateQuestion(state, payload) {
+    let question = state.questions.filter(q => q.id == payload.question.id)[0];
+    let currentQuestion = {
+        id: payload.question.id,
+        title: payload.question.title,
+        author: question.author,
+        text: payload.question.text,
+        creationDate: question.creationDate,
+        voteCount: payload.question.voteCount,
+        tags: question.tags
+    };
+    let allQuestions = state.questions.concat([]);
+    allQuestions[allQuestions.indexOf(question)] = currentQuestion;
+    debugger;
     return {
         ...state,
         questions: allQuestions
@@ -146,5 +123,12 @@ function loadQuestions(state, payload) {
     return {
         ...state,
         questions: payload.questions
+    };
+}
+
+function searchQuestions(state, payload) {
+    return {
+        ...state,
+        searchedQuestions: payload.questions
     };
 }

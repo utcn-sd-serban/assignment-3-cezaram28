@@ -5,6 +5,9 @@ import * as voteSelectors from "../model/vote/voteSelectors";
 import * as voteActions from "../model/vote/voteActions";
 import store from "../model/store/store";
 
+import RestClient from "../rest/RestClient";
+
+
 class QuestionDetailsPresenter {
 
     onLogout() {
@@ -21,44 +24,32 @@ class QuestionDetailsPresenter {
     }
 
     onDelete(index) {
-        store.dispatch(answerActions.deleteAnswer(index));
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        client.deleteAnswer(index, userSelectors.getCurrentUser());
+    }
+
+    onInit(questionId) {
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        client.answersByQuestion(questionId).then(answers => {
+            store.dispatch(answerActions.saveFiltered(answers));
+        });
+
+        client.loadUsers().then(users => {
+            store.dispatch(userActions.loadUsers(users));
+        });
     }
 
     onVote(votedQuestion, votedAnswer, type) {
-        if (votedAnswer !== undefined) {
-            let v = voteSelectors.findByAnswer(votedAnswer.id, userSelectors.getCurrentIndex());
-            if (v.length > 0) {
-                //already voted
-                if (v[0].type === "up" && type === "down") {
-                    //change from upvote to downvote
-
-                    store.dispatch(userActions.updateScore(votedAnswer.author.id, -12));
-                    store.dispatch(userActions.updateScore(userSelectors.getCurrentIndex(), -1));
-                    store.dispatch(answerActions.changeAnswerScore(votedAnswer.id, -2));
-                    store.dispatch(voteActions.changeVoteType(v[0].id, type));
-                }
-                else if (v[0].type === "down" && type === "up") {
-                    //change from down to up
-                    store.dispatch(userActions.updateScore(votedAnswer.author.id, 12));
-                    store.dispatch(userActions.updateScore(userSelectors.getCurrentIndex(), 1));
-                    store.dispatch(answerActions.changeAnswerScore(votedAnswer.id, 2));
-                    store.dispatch(voteActions.changeVoteType(v[0].id, type));
-                }
-            } else {
-                store.dispatch(voteActions.addVote(undefined, votedAnswer, type, userSelectors.getCurrentUser()));
-                if (type === "down") {
-                    //downvote
-                    store.dispatch(userActions.updateScore(votedAnswer.author.id, -2));
-                    store.dispatch(userActions.updateScore(userSelectors.getCurrentIndex(), -1));
-                    store.dispatch(answerActions.changeAnswerScore(votedAnswer.id, -1));
-                }
-                else {
-                    //up
-                    store.dispatch(userActions.updateScore(votedAnswer.author.id, 10));
-                    store.dispatch(answerActions.changeAnswerScore(votedAnswer.id, 1));
-                }
-            }
-        }
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        let loggedUserId = userSelectors.getCurrentUser().id;
+        if (type == "up") client.upvoteAnswer(loggedUserId, votedAnswer).then(status => {
+            if (status >= 300)
+                alert("Cannot upvote twice!");
+        });
+        else client.downvoteAnswer(loggedUserId, votedAnswer).then(status => {
+            if (status >= 300)
+                alert("Cannot downvote twice!");
+        });
     }
 
 }

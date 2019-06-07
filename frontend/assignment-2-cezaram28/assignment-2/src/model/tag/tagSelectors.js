@@ -3,7 +3,8 @@ import * as tagActions from "./tagActions";
 
 export function toString(tags) {
     let s = "";
-    tags.forEach(tag => s = s + tag.name + " ");
+    //tags.forEach(tag => s = s + tag.name + " ");
+    tags.forEach(tag => s = s + tag + " ");
     return s;
 }
 
@@ -20,12 +21,13 @@ export function toList(tags) {
         let ind = found(tagNames[i]);
         if (ind === -1) {
             store.dispatch(tagActions.addTag(tagNames[i]));
-            tagList.push(returnTag(tagNames[i]));
+            //tagList.push(returnTag(tagNames[i]));
+            //tagList.push(tagNames[i]);
         } else {
-            tagList.push(store.getState().tagState.tags[ind]);
+            //tagList.push(store.getState().tagState.tags[ind]);
         }
     }
-    return tagList;
+    return tagNames;
 }
 
 export function returnTag(tag) {
@@ -34,4 +36,15 @@ export function returnTag(tag) {
 
 export function getNewTag() {
     return store.getState().tagState.newTag;
+}
+
+export function makeTags(tags) {
+    return tags.map(tag => makeTag(tag));
+}
+
+function makeTag(tag) {
+    return {
+        id: "",
+        name: tag
+    }
 }

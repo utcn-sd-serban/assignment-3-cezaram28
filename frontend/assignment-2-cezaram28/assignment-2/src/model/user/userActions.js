@@ -1,11 +1,9 @@
 
-export function addUser(username, password, email) {
+export function addUser(user) {
     return {
         type: "ADD_USER",
         payload: {
-            username,
-            password,
-            email
+            user
         }
     }
 }
@@ -38,6 +36,15 @@ export function banUser(id) {
     }
 }
 
+export function updateUser(user) {
+    return {
+        type: "UPDATE_USER",
+        payload: {
+            user
+        }
+    }
+}
+
 export function updateScore(id, value) {
     return {
         type: "UPDATE_SCORE",
@@ -60,6 +67,15 @@ export function updateCurrentUserIndex(index) {
         type: "UPDATE_CURRENT_INDEX",
         payload: {
             index
+        }
+    }
+}
+
+export function loadUsers(users) {
+    return {
+        type: "LOAD_USERS",
+        payload: {
+            users
         }
     }
 }

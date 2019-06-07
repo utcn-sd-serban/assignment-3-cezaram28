@@ -16,6 +16,11 @@ public class HibernateQuestionRepository implements QuestionRepository {
     private final EntityManager entityManager;
 
     @Override
+    public void deleteAll() {
+        entityManager.clear();
+    }
+
+    @Override
     public List<Question> findAll() {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Question> query = builder.createQuery(Question.class);

@@ -13,6 +13,7 @@ import SmartSearchQuestions from './view/SmartSearchQuestions';
 import SmartStart from './view/SmartStart';
 import SmartLogin from './view/SmartLogin';
 import SmartRegister from './view/SmartRegister';
+import WebSocketListener from './ws/WebSocketListener';
 
 const App = () => (
     <div className="App">

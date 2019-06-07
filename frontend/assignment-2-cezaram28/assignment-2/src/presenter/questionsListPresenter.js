@@ -1,18 +1,31 @@
 import * as questionActions from "../model/question/questionActions";
 import * as userActions from "../model/user/userActions";
+import * as tagActions from "../model/tag/tagActions";
 import * as userSelectors from "../model/user/userSelectors";
-import * as voteSelectors from "../model/vote/voteSelectors";
-import * as voteActions from "../model/vote/voteActions";
 import store from "../model/store/store";
 import RestClient from "../rest/RestClient";
-
-const client = new RestClient("user1", "pass1");
 
 class QuestionListPresenter {
 
     loadQuestions() {
+        let user = userSelectors.getCurrentUser();
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
         client.loadAllQuestions().then(questions => {
             store.dispatch(questionActions.loadQuestions(questions));
+        });
+    }
+
+    loadUsers() {
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        client.loadUsers().then(users => {
+            store.dispatch(userActions.loadUsers(users));
+        });
+    }
+
+    loadTags() {
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        client.loadTags().then(tags => {
+            store.dispatch(tagActions.loadTags(tags));
         });
     }
 
@@ -43,9 +56,10 @@ class QuestionListPresenter {
     }
 
     onSearch(title) {
-        /*client.loadByTitle(title).then(questions => {
-            store.dispatch(questionActions.loadQuestions(questions));
-        });*/
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        client.loadByTitle(title).then(questions => {
+           store.dispatch(questionActions.searchQuestions(questions));
+        });
         store.dispatch(questionActions.changeNewQuestionProperty("title", title));
         store.dispatch(questionActions.changeNewQuestionProperty("text", ""));
         store.dispatch(questionActions.changeNewQuestionProperty("tags", ""));
@@ -53,9 +67,10 @@ class QuestionListPresenter {
     }
 
     onTagClick(tag) {
-        /*client.loadByTag(tag).then(questions => {
-            store.dispatch(questionActions.loadQuestions(questions));
-        });*/
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        client.loadByTag(tag).then(questions => {
+            store.dispatch(questionActions.searchQuestions(questions));
+        });
         store.dispatch(questionActions.changeNewQuestionProperty("title", ""));
         store.dispatch(questionActions.changeNewQuestionProperty("text", ""));
         store.dispatch(questionActions.changeNewQuestionProperty("tags", tag));
@@ -67,7 +82,9 @@ class QuestionListPresenter {
     }
 
     onDelete(index) {
-        store.dispatch(questionActions.deleteQuestion(index));
+        let loggedUser = userSelectors.getCurrentUser();
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        client.deleteQuestion(index, loggedUser);
     }
 
     onEdit(index) {
@@ -75,35 +92,18 @@ class QuestionListPresenter {
     }
 
     onVote(votedQuestion, votedAnswer, type) {
-        if (votedQuestion !== undefined) {
-            let v = voteSelectors.findByQuestion(votedQuestion.id, userSelectors.getCurrentIndex());
-            if (v.length > 0) {
-                //already voted
-                if (v[0].type === "up" && type === "down") {
-                    //change from upvote to downvote
-                    store.dispatch(userActions.updateScore(votedQuestion.author.id, -7));
-                    store.dispatch(questionActions.changeQuestionScore(votedQuestion.id, -2));
-                    store.dispatch(voteActions.changeVoteType(v[0].id, type));
-                }
-                else if (v[0].type === "down" && type === "up") {
-                    //change from down to up
-                    store.dispatch(userActions.updateScore(votedQuestion.author.id, 7));
-                    store.dispatch(questionActions.changeQuestionScore(votedQuestion.id, 2));
-                    store.dispatch(voteActions.changeVoteType(v[0].id, type));
-                }
-            } else {
-                store.dispatch(voteActions.addVote(votedQuestion, undefined, type, userSelectors.getCurrentUser()));
-                if (type === "down") {
-                    //downvote
-                    store.dispatch(userActions.updateScore(votedQuestion.author.id, -2));
-                    store.dispatch(questionActions.changeQuestionScore(votedQuestion.id, -1));
-                }
-                else {
-                    //up
-                    store.dispatch(userActions.updateScore(votedQuestion.author.id, 5));
-                    store.dispatch(questionActions.changeQuestionScore(votedQuestion.id, 1));
-                }
-            }
+        let loggedUserId = userSelectors.getCurrentUser().id;
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        if (type == "up") {
+            client.upvoteQuestion(loggedUserId, votedQuestion).then(status => {
+                if (status >= 300)
+                    alert("Cannot upvote twice!");
+            });;
+        } else {
+            client.downvoteQuestion(loggedUserId, votedQuestion).then(status => {
+                if (status >= 300)
+                    alert("Cannot downvote twice!");
+            });;
         }
     }
 }

@@ -44,6 +44,11 @@ public class HibernateUserRepository implements UserRepository {
     }
 
     @Override
+    public void deleteAll() {
+        entityManager.clear();
+    }
+
+    @Override
     public Optional<User> findByName(String username) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> query = builder.createQuery(User.class);

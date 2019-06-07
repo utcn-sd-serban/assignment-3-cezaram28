@@ -26,3 +26,7 @@ export function findByAuthor(username) {
 export function getNewQuestion() {
     return store.getState().questionState.newQuestion;
 }
+
+export function findById(questionId) {
+    return store.getState().questionState.questions.filter(q => q.id == questionId)[0];
+}

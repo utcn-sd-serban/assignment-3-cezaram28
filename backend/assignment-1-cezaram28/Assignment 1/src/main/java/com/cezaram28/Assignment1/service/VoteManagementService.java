@@ -1,20 +1,20 @@
 package com.cezaram28.Assignment1.service;
 
+import com.cezaram28.Assignment1.dto.AnswerDTO;
 import com.cezaram28.Assignment1.dto.QuestionDTO;
 import com.cezaram28.Assignment1.dto.UserDTO;
 import com.cezaram28.Assignment1.dto.VoteDTO;
-import com.cezaram28.Assignment1.entity.Answer;
-import com.cezaram28.Assignment1.entity.Question;
 import com.cezaram28.Assignment1.entity.User;
 import com.cezaram28.Assignment1.entity.Vote;
+import com.cezaram28.Assignment1.event.QuestionUpdatedEvent;
+import com.cezaram28.Assignment1.event.UserUpdatedEvent;
 import com.cezaram28.Assignment1.exception.*;
 import com.cezaram28.Assignment1.repository.RepositoryFactory;
 import com.cezaram28.Assignment1.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,10 +23,11 @@ public class VoteManagementService {
     private final QuestionManagementService questionManagementService;
     private final UserManagementService userManagementService;
     private final AnswerManagementService answerManagementService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public VoteDTO save(Vote vote) {
-        return VoteDTO.ofEntity(repositoryFactory.createVoteRepository().save(vote));
+    public VoteDTO save(VoteDTO vote) {
+        return VoteDTO.ofEntity(repositoryFactory.createVoteRepository().save(VoteDTO.toEntity(vote)));
     }
 
     @Transactional
@@ -47,15 +48,19 @@ public class VoteManagementService {
         return VoteDTO.ofEntity(repositoryFactory.createVoteRepository()
                 .findByAnswer(answerId, userId).orElseThrow(VoteNotFoundException::new));
     }
-    /*
+
     @Transactional
     public void upvoteQuestion(QuestionDTO question, UserDTO user) {
         if (question.getAuthor().getId() == user.getId()) {
             throw new YourPostException();
         } else {
-            Vote vote = new Vote(null, "up", QuestionDTO.toEntity(question), null, user);
+            VoteDTO vote = new VoteDTO();
+            vote.setUser(user);
+            vote.setQuestion(question);
+            vote.setType("up");
+
             try {
-                Vote v = findByQuestion(question.getId(), user.getId());
+                VoteDTO v = findByQuestion(question.getId(), user.getId());
                 if (v.getType().equals(vote.getType())) {
                     throw new UpvotedException();
                 } else {
@@ -63,33 +68,41 @@ public class VoteManagementService {
                     v.setType("up");
                     save(v);
 
-                    question.setVoteCount(question.getVoteCount() + 2);
-                    questionManagementService.addQuestion(question);
+                    questionManagementService.changeScore(question, question.getVoteCount() + 2);
 
                     question.getAuthor().setScore(question.getAuthor().getScore() + 7);
-                    userManagementService.addUser(question.getAuthor());
+
+                    User u = repositoryFactory.createUserRepository().findById(question.getAuthor().getId()).orElseThrow(UserNotFoundException::new);
+                    u.setScore(question.getAuthor().getScore());
+                    repositoryFactory.createUserRepository().save(u);
+                    eventPublisher.publishEvent(new UserUpdatedEvent(question.getAuthor()));
                 }
             } catch (VoteNotFoundException e) {
                 vote.setType("up");
                 save(vote);
 
-                question.setVoteCount(question.getVoteCount() + 1);
-                questionManagementService.addQuestion(question);
+                questionManagementService.changeScore(question, question.getVoteCount() + 1);
 
                 question.getAuthor().setScore(question.getAuthor().getScore() + 5);
-                userManagementService.addUser(question.getAuthor());
+                User u = repositoryFactory.createUserRepository().findById(question.getAuthor().getId()).orElseThrow(UserNotFoundException::new);
+                u.setScore(question.getAuthor().getScore());
+                repositoryFactory.createUserRepository().save(u);
+                eventPublisher.publishEvent(new UserUpdatedEvent(question.getAuthor()));
             }
         }
     }
 
     @Transactional
-    public void downvoteQuestion(Question question, User user) {
+    public void downvoteQuestion(QuestionDTO question, UserDTO user) {
         if (question.getAuthor().getId() == user.getId()) {
             throw new YourPostException();
         } else {
-            Vote vote = new Vote(null, "down", question, null, user);
+            VoteDTO vote = new VoteDTO();
+            vote.setType("down");
+            vote.setQuestion(question);
+            vote.setUser(user);
             try {
-                Vote v = findByQuestion(question.getId(), user.getId());
+                VoteDTO v = findByQuestion(question.getId(), user.getId());
                 if (v.getType().equals(vote.getType())) {
                     throw new DownvotedException();
                 } else {
@@ -97,33 +110,40 @@ public class VoteManagementService {
                     v.setType("down");
                     save(v);
 
-                    question.setVoteCount(question.getVoteCount() - 2);
-                    questionManagementService.addQuestion(question);
+                    questionManagementService.changeScore(question, question.getVoteCount() - 2);
 
                     question.getAuthor().setScore(question.getAuthor().getScore() - 7);
-                    userManagementService.addUser(question.getAuthor());
+                    User u = repositoryFactory.createUserRepository().findById(question.getAuthor().getId()).orElseThrow(UserNotFoundException::new);
+                    u.setScore(question.getAuthor().getScore());
+                    repositoryFactory.createUserRepository().save(u);
+                    eventPublisher.publishEvent(new UserUpdatedEvent(question.getAuthor()));
                 }
             } catch (VoteNotFoundException e) {
                 vote.setType("down");
                 save(vote);
 
-                question.setVoteCount(question.getVoteCount() - 1);
-                questionManagementService.addQuestion(question);
-
+                questionManagementService.changeScore(question, question.getVoteCount() - 1);
                 question.getAuthor().setScore(question.getAuthor().getScore() - 2);
-                userManagementService.addUser(question.getAuthor());
+                User u = repositoryFactory.createUserRepository().findById(question.getAuthor().getId()).orElseThrow(UserNotFoundException::new);
+                u.setScore(question.getAuthor().getScore());
+
+                repositoryFactory.createUserRepository().save(u);
+                eventPublisher.publishEvent(new UserUpdatedEvent(question.getAuthor()));
             }
         }
     }
 
     @Transactional
-    public void upvoteAnswer(Answer answer, User user) {
+    public void upvoteAnswer(AnswerDTO answer, UserDTO user) {
         if (answer.getAuthor().getId() == user.getId()) {
             throw new YourPostException();
         } else {
-            Vote vote = new Vote(null, "up", null, answer, user);
+            VoteDTO vote = new VoteDTO();
+            vote.setType("up");
+            vote.setAnswer(answer);
+            vote.setUser(user);
             try {
-                Vote v = findByAnswer(answer.getId(), user.getId());
+                VoteDTO v = findByAnswer(answer.getId(), user.getId());
                 if (v.getType().equals(vote.getType())) {
                     throw new UpvotedException();
                 } else {
@@ -131,36 +151,47 @@ public class VoteManagementService {
                     v.setType("up");
                     save(v);
 
-                    answer.setVoteCount(answer.getVoteCount() + 2);
-                    answerManagementService.addAnswer(answer);
+                    answerManagementService.changeScore(answer, answer.getVoteCount() + 2);
 
                     answer.getAuthor().setScore(answer.getAuthor().getScore() + 12);
-                    userManagementService.addUser(answer.getAuthor());
+                    User u = repositoryFactory.createUserRepository().findById(answer.getAuthor().getId()).orElseThrow(UserNotFoundException::new);
+                    u.setScore(answer.getAuthor().getScore());
+
+                    repositoryFactory.createUserRepository().save(UserDTO.toEntity(answer.getAuthor()));
+                    eventPublisher.publishEvent(new UserUpdatedEvent(answer.getAuthor()));
 
                     user.setScore(user.getScore() + 1);
-                    userManagementService.addUser(user);
+                    u = repositoryFactory.createUserRepository().findById(user.getId()).orElseThrow(UserNotFoundException::new);
+                    u.setScore(user.getScore());
+                    repositoryFactory.createUserRepository().save(u);
+                    eventPublisher.publishEvent(new UserUpdatedEvent(user));
                 }
             } catch (VoteNotFoundException e) {
                 vote.setType("up");
                 save(vote);
 
-                answer.setVoteCount(answer.getVoteCount() + 1);
-                answerManagementService.addAnswer(answer);
+                answerManagementService.changeScore(answer, answer.getVoteCount() + 1);
 
                 answer.getAuthor().setScore(answer.getAuthor().getScore() + 10);
-                userManagementService.addUser(answer.getAuthor());
+                User u = repositoryFactory.createUserRepository().findById(answer.getAuthor().getId()).orElseThrow(UserNotFoundException::new);
+                u.setScore(answer.getAuthor().getScore());
+                repositoryFactory.createUserRepository().save(u);
+                eventPublisher.publishEvent(new UserUpdatedEvent(answer.getAuthor()));
             }
         }
     }
 
     @Transactional
-    public void downvoteAnswer(Answer answer, User user) {
+    public void downvoteAnswer(AnswerDTO answer, UserDTO user) {
         if (answer.getAuthor().getId() == user.getId()) {
             throw new YourPostException();
         } else {
-            Vote vote = new Vote(null, "down", null, answer, user);
+            VoteDTO vote = new VoteDTO();
+            vote.setType("down");
+            vote.setAnswer(answer);
+            vote.setUser(user);
             try {
-                Vote v = findByAnswer(answer.getId(), user.getId());
+                VoteDTO v = findByAnswer(answer.getId(), user.getId());
                 if (v.getType().equals(vote.getType())) {
                     throw new DownvotedException();
                 } else {
@@ -168,28 +199,38 @@ public class VoteManagementService {
                     v.setType("down");
                     save(v);
 
-                    answer.setVoteCount(answer.getVoteCount() - 2);
-                    answerManagementService.addAnswer(answer);
+                    answerManagementService.changeScore(answer, answer.getVoteCount() - 2);
 
                     answer.getAuthor().setScore(answer.getAuthor().getScore() - 12);
-                    userManagementService.addUser(answer.getAuthor());
+                    User u = repositoryFactory.createUserRepository().findById(answer.getAuthor().getId()).orElseThrow(UserNotFoundException::new);
+                    u.setScore(answer.getAuthor().getScore());
+                    repositoryFactory.createUserRepository().save(u);
+                    eventPublisher.publishEvent(new UserUpdatedEvent(answer.getAuthor()));
 
                     user.setScore(user.getScore() - 1);
-                    userManagementService.addUser(user);
+                    u = repositoryFactory.createUserRepository().findById(user.getId()).orElseThrow(UserNotFoundException::new);
+                    u.setScore(user.getScore());
+                    repositoryFactory.createUserRepository().save(u);
+                    eventPublisher.publishEvent(new UserUpdatedEvent(user));
                 }
             } catch (VoteNotFoundException e) {
                 vote.setType("down");
                 save(vote);
 
-                answer.setVoteCount(answer.getVoteCount() - 1);
-                answerManagementService.addAnswer(answer);
+                answerManagementService.changeScore(answer, answer.getVoteCount() - 1);
 
                 answer.getAuthor().setScore(answer.getAuthor().getScore() - 2);
-                userManagementService.addUser(answer.getAuthor());
+                User u = repositoryFactory.createUserRepository().findById(answer.getAuthor().getId()).orElseThrow(UserNotFoundException::new);
+                u.setScore(answer.getAuthor().getScore());
+                repositoryFactory.createUserRepository().save(u);
+                eventPublisher.publishEvent(new UserUpdatedEvent(answer.getAuthor()));
 
                 user.setScore(user.getScore() - 1);
-                userManagementService.addUser(user);
+                u = repositoryFactory.createUserRepository().findById(user.getId()).orElseThrow(UserNotFoundException::new);
+                u.setScore(user.getScore());
+                repositoryFactory.createUserRepository().save(u);
+                eventPublisher.publishEvent(new UserUpdatedEvent(user));
             }
         }
-    }*/
+    }
 }

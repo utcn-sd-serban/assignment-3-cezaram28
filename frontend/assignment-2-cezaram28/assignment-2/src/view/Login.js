@@ -30,17 +30,17 @@ const Start = ({ onLogin, onRegister, username, password, onChange }) => (
                     <div class="field">
                         
                         <div class="control">
-                            <input class="input" type="text" placeholder="Username" value={username} onChange={e => onChange("username", e.target.value)}/>
+                            <input data-cy="username" class="input" type="text" placeholder="Username" value={username} onChange={e => onChange("username", e.target.value)}/>
                         </div>
                         <br/>
                         <div class="control">
-                            <input class="input" type="password" placeholder="Password" value={password} onChange={e => onChange("password", e.target.value)} />
+                            <input data-cy="password" class="input" type="password" placeholder="Password" value={password} onChange={e => onChange("password", e.target.value)} />
                         </div>
   
                     </div>
                     <br/>
                     <div class="buttons">
-                        <a class="button is-primary is-inverted" onClick={() => onLogin()}>
+                        <a data-cy="login" class="button is-primary is-inverted" onClick={() => onLogin()}>
                             Login
                         </a>
                     </div>

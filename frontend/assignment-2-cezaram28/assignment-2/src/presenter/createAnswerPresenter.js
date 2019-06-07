@@ -4,6 +4,8 @@ import * as answerSelectors from "../model/answer/answerSelectors";
 import * as userActions from "../model/user/userActions";
 import * as userSelectors from "../model/user/userSelectors";
 
+import RestClient from "../rest/RestClient";
+
 class CreateAnswerPresenter {
 
     onLogout() {
@@ -13,7 +15,9 @@ class CreateAnswerPresenter {
 
     onCreate(question) {
         let newAnswer = answerSelectors.getNewAnswer();
-        store.dispatch(answerActions.addAnswer(question, newAnswer.text, userSelectors.getCurrentUser()));
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        client.createAnswer(newAnswer.text, userSelectors.getCurrentUser(), question);
+        
         store.dispatch(answerActions.changeNewAnswerProperty("text", ""));
         window.location.assign("#/view-question/" + question.id);
     }

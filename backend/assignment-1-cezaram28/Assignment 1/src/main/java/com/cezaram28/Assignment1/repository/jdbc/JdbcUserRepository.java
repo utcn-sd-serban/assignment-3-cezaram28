@@ -17,6 +17,11 @@ public class JdbcUserRepository implements UserRepository {
     private final JdbcTemplate template;
 
     @Override
+    public void deleteAll() {
+        template.update("DELETE FROM user");
+    }
+
+    @Override
     public List<User> findAll() {
         return template.query("SELECT * FROM user", new UserMapper());
     }

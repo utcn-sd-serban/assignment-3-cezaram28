@@ -1,10 +1,8 @@
-export function addAnswer(question, text, user) {
+export function addAnswer(answer) {
     return {
         type: "ADD_ANSWER",
         payload: {
-            question,
-            text,
-            user
+            answer
         }
     };
 }
@@ -15,6 +13,15 @@ export function editAnswer(id, text) {
         payload: {
             id,
             text
+        }
+    };
+}
+
+export function updateAnswer(answer) {
+    return {
+        type: "UPDATE_ANSWER",
+        payload: {
+            answer
         }
     };
 }
@@ -44,6 +51,15 @@ export function changeNewAnswerProperty(property, value) {
         payload: {
             property,
             value
+        }
+    };
+}
+
+export function saveFiltered(answers) {
+    return {
+        type: "SAVE_FILTERED",
+        payload: {
+            answers
         }
     };
 }

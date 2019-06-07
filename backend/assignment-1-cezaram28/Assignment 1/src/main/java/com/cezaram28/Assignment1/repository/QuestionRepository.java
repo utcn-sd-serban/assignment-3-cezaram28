@@ -11,6 +11,7 @@ public interface QuestionRepository {
     Optional<List<Question>> findUsersAll(int userId);
     Question save(Question question);
     void remove(Question question);
+    void deleteAll();
     Optional<Question> findById(int id);
 
 }

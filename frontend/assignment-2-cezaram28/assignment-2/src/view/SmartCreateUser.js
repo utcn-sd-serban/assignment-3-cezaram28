@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import user from "../model/user";
+/* import React, { Component } from "react";
 import createUserPresenter from "../presenter/createUserPresenter";
 import CreateUser from "./CreateUser";
 
@@ -31,4 +30,4 @@ export default class SmartCreateUser extends Component {
                 email={this.state.email} />
         );
     }
-}
+}*/

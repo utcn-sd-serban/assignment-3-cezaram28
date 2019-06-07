@@ -26,11 +26,11 @@ const EditAnswer = ({ user, text, id, questionId, onEdit, onChange, onLogout }) 
             <div>
                 <div class="field">
                     <div class="control">
-                        <textarea value={text} onChange={e => onChange("text", e.target.value)} class="textarea is-primary" type="text" placeholder="New Text" />
+                        <textarea data-cy="text" value={text} onChange={e => onChange("text", e.target.value)} class="textarea is-primary" type="text" placeholder="New Text" />
                     </div>
                 </div>
                 <br />
-                <button class="button is-primary" onClick={() => onEdit(id, questionId)}>Edit!</button>
+                <button data-cy="edit" class="button is-primary" onClick={() => onEdit(id, questionId)}>Edit!</button>
             </div>
         </div>
     </div>

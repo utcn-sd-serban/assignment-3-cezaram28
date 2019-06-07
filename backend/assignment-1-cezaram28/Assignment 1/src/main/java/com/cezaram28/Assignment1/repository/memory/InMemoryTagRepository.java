@@ -17,6 +17,11 @@ public class InMemoryTagRepository implements TagRepository {
     private final AtomicInteger currentId = new AtomicInteger(0);
 
     @Override
+    public void deleteAll() {
+        data.clear();
+    }
+
+    @Override
     public List<Tag> findAll() {
         return new ArrayList<>(data.values());
     }

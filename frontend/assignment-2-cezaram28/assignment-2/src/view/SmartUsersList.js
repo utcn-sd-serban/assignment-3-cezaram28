@@ -20,6 +20,10 @@ class SmartUsersList extends Component {
         super();
     }
 
+    componentDidMount() {
+        usersListPresenter.onInit();
+    }
+
     render() {
         return (
             <UsersList

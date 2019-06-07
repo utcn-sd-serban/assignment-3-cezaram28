@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,17 +29,16 @@ public class TagManagementService {
     }
 
     @Transactional
-    public List<Tag> listTags() {
+    public List<String> listTags() {
         List<Tag> tags = repositoryFactory.createTagRepository().findAll();
-        if(tags.isEmpty()) throw new TagNotFoundException();
-        return tags;
+        //if(tags.isEmpty()) throw new TagNotFoundException();
+        return tags.stream().map(Tag::getName).collect(Collectors.toList());
     }
 
     @Transactional
-    public ArrayList<Tag> addTags(String[] t) {
+    public ArrayList<Tag> addTags(List<String> t) {
         ArrayList<Tag> tags = new ArrayList<Tag>();
-        for (int i = 0; i < t.length; i++)
-            tags.add(new Tag(null, t[i].trim()));
+        t.forEach(tag -> tags.add(new Tag(null, tag)));
         tags.forEach(tag -> tag.setId(addTag(tag).getId()));
         return tags;
     }

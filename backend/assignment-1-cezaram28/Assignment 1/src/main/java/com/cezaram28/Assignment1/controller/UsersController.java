@@ -1,12 +1,12 @@
 package com.cezaram28.Assignment1.controller;
 
 import com.cezaram28.Assignment1.dto.UserDTO;
+import com.cezaram28.Assignment1.dto.UserRegisterDTO;
+import com.cezaram28.Assignment1.entity.User;
+import com.cezaram28.Assignment1.service.UserLoginDetailsService;
 import com.cezaram28.Assignment1.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -14,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsersController {
     private final UserManagementService userService;
+    private final UserLoginDetailsService userLoginDetailsService;
 
     @GetMapping("/users")
     public List<UserDTO> readAll() {
@@ -21,8 +22,18 @@ public class UsersController {
     }
 
     @PostMapping("/users")
-    public UserDTO create(@RequestBody UserDTO dto){
+    public UserDTO create(@RequestBody UserRegisterDTO dto) {
         return userService.addUser(dto);
     }
 
+    @PutMapping("/users/{id}/ban")
+    public UserDTO ban(@PathVariable int id, @RequestBody UserDTO user) {
+        return userService.ban(id, user);
+    }
+
+    @GetMapping("/login")
+    public UserDTO login(){
+        User logged = userLoginDetailsService.loadCurrentUser();
+        return UserDTO.ofEntity(logged);
+    }
 }

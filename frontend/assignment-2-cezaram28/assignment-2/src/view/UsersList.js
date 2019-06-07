@@ -37,7 +37,7 @@ const UsersList = ({ user, users, title, onLogout, onBan }) => (
                             <tr key={index}>
                                 <td>{u.username}</td>
                                 <td>{u.score}</td>
-                                <td>{user !== undefined && user.id !== -1 ? user.isAdmin ? <button class="button is-small" onClick={() => onBan(u.id)}>Ban</button> : "" : ""}</td>
+                                <td>{user !== undefined && user.id !== -1 ? user.isAdmin ? <button data-cy={"ban" + u.username} class="button is-small" onClick={() => onBan(u.id)}>Ban</button> : "" : ""}</td>
                             </tr>
                         ))
                     }

@@ -27,6 +27,8 @@ public class QuestionDTO {
         questionDTO.setText(question.getText());
         questionDTO.setCreationDate(question.getCreationDate());
         questionDTO.setVoteCount(question.getVoteCount());
+        if(question.getTags().isEmpty()) questionDTO.setTags(new ArrayList<String>());
+        else
         questionDTO.setTags(question.getTags().stream().map(Tag::getName).collect(Collectors.toList()));
         return questionDTO;
     }

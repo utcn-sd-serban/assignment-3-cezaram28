@@ -4,11 +4,12 @@ import * as answerSelector from "../model/answer/answerSelectors";
 import * as tagSelector from "../model/tag/tagSelectors";
 import QuestionDetails from "./QuestionDetails";
 import questionDetailsPresenter from "../presenter/questionDetailsPresenter";
+import { findById } from "../model/question/questionSelectors";
 
 const mapQuestionStateToComponentState = (state, props) => ({
-    question: state.questionState.questions[props.match.params.index],
+    question: findById(props.match.params.index),
     user: state.userState.users[state.userState.currentUserIndex],
-    answers: answerSelector.findByQuestion(props.match.params.index)
+    answers: state.answerState.answers
 });
 
 function mapDispatchToProps(dispatch) {
@@ -24,6 +25,10 @@ function mapDispatchToProps(dispatch) {
 class SmartQuestionDetails extends Component {
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount() {
+        questionDetailsPresenter.onInit(this.props.match.params.index);
     }
 
     render() {

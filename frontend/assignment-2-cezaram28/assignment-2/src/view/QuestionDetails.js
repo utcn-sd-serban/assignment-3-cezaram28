@@ -1,5 +1,4 @@
 import React from "react";
-import user from "../model/user"
 
 const QuestionDetails = ({ user, id, title, author, text, creationDate, voteCount, tags, answers, addAnswer, onEdit, onDelete, onVote, onLogout }) => (
     <div>
@@ -15,7 +14,7 @@ const QuestionDetails = ({ user, id, title, author, text, creationDate, voteCoun
                         {user !== undefined ? user.username : ""}
                     </a>
                     <div class="buttons">
-                        <a class="button is-light" onClick={onLogout}>
+                        <a data-cy="logout" class="button is-light" onClick={onLogout}>
                             Logout
                         </a>
                     </div>
@@ -55,15 +54,15 @@ const QuestionDetails = ({ user, id, title, author, text, creationDate, voteCoun
                 <tbody>
                     {
                         answers.map((answer, index) => (
-                            <tr key={index}>
+                            <tr key={index} data-cy="answer">
                                 <td>{answer.author.username}</td>
                                 <td>{answer.text}</td>
                                 <td>{answer.voteCount}</td>
                                 <td>{answer.creationDate}</td>
-                                <td>{user !== undefined && (answer.author.id === user.id || user.isAdmin) ? <button class="button is-small" onClick={() => onEdit(answer.id, answer.question.id)}>Edit</button> : ""}</td>
-                                <td>{user !== undefined && (answer.author.id === user.id || user.isAdmin) ? <button class="button is-small" onClick={() => onDelete(answer.id)}>Delete</button> : ""}</td>
-                                <td>{user !== undefined && answer.author.id !== user.id ? <button class="button is-small" onClick={() => onVote(undefined, answer, "up")}>Upvote</button> : ""}</td>
-                                <td>{user !== undefined && answer.author.id !== user.id ? <button class="button is-small" onClick={() => onVote(undefined, answer, "down")}>Downvote</button> : ""}</td>
+                                <td>{user !== undefined && (answer.author.id === user.id || user.isAdmin) ? <button data-cy={"edit" + answer.text} class="button is-small" onClick={() => onEdit(answer.id, answer.question.id)}>Edit</button> : ""}</td>
+                                <td>{user !== undefined && (answer.author.id === user.id || user.isAdmin) ? <button data-cy={"delete" + answer.text} class="button is-small" onClick={() => onDelete(answer.id)}>Delete</button> : ""}</td>
+                                <td>{user !== undefined && answer.author.id !== user.id ? <button data-cy={"upvote" + answer.text} class="button is-small" onClick={() => onVote(undefined, answer, "up")}>Upvote</button> : ""}</td>
+                                <td>{user !== undefined && answer.author.id !== user.id ? <button data-cy={"downvote" + answer.text} class="button is-small" onClick={() => onVote(undefined, answer, "down")}>Downvote</button> : ""}</td>
                             </tr>
                         ))
                     }

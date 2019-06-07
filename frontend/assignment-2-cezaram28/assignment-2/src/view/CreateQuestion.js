@@ -1,5 +1,4 @@
 import React from "react";
-import user from "../model/user";
 
 const CreateQuestion = ({ user, title, text, tags, onCreate, onChange, onLogout }) => (
     <div>
@@ -27,21 +26,21 @@ const CreateQuestion = ({ user, title, text, tags, onCreate, onChange, onLogout 
             <div>
                 <div class="field">
                     <div class="control">
-                        <input value={title} onChange={e => onChange("title", e.target.value)} class="input is-primary" type="title" placeholder="Question Title" />
+                        <input data-cy="title" value={title} onChange={e => onChange("title", e.target.value)} class="input is-primary" type="title" placeholder="Question Title" />
                     </div>
                 </div>
                 <div class="field">
                     <div class="control">
-                        <textarea value={text} onChange={e => onChange("text", e.target.value)} class="textarea is-primary" type="text" placeholder="Question Text" />
+                        <textarea data-cy="text" value={text} onChange={e => onChange("text", e.target.value)} class="textarea is-primary" type="text" placeholder="Question Text" />
                     </div>
                 </div>
                 <div class="field">
                     <div class="control">
-                        <input value={tags} onChange={e => onChange("tags", e.target.value)} class="input is-primary" type="tags" placeholder="Question Tags" />
+                        <input data-cy="tags" value={tags} onChange={e => onChange("tags", e.target.value)} class="input is-primary" type="tags" placeholder="Question Tags" />
                     </div>
                 </div>
                 <br />
-                <button class="button is-primary" onClick={() => onCreate()}>Post!</button>
+                <button data-cy="addQuestion" class="button is-primary" onClick={() => onCreate()}>Post!</button>
             </div>
         </div>
     </div>

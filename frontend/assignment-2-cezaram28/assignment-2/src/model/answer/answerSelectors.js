@@ -12,3 +12,7 @@ export function findByQuestion(questionId) {
 export function getNewAnswer() {
     return store.getState().answerState.newAnswer;
 }
+
+export function findById(answerId) {
+    return store.getState().answerState.answers.filter(a => a.id == answerId)[0];
+}

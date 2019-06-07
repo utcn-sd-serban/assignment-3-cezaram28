@@ -16,6 +16,11 @@ public class HibernateTagRepository implements TagRepository {
     private final EntityManager entityManager;
 
     @Override
+    public void deleteAll() {
+        entityManager.clear();
+    }
+
+    @Override
     public List<Tag> findAll() {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tag> query = builder.createQuery(Tag.class);

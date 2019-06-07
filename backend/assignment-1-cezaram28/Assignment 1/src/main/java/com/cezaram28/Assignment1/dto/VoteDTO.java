@@ -2,6 +2,7 @@ package com.cezaram28.Assignment1.dto;
 
 import com.cezaram28.Assignment1.entity.Vote;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
 public class VoteDTO {
@@ -15,8 +16,19 @@ public class VoteDTO {
         VoteDTO voteDTO = new VoteDTO();
         voteDTO.setId(vote.getId());
         voteDTO.setType(vote.getType());
-        voteDTO.setQuestion(QuestionDTO.ofEntity(vote.getQuestion()));
-        voteDTO.setAnswer(AnswerDTO.ofEntity(vote.getAnswer()));
+
+        if(vote.getQuestion() != null){
+            voteDTO.setQuestion(QuestionDTO.ofEntity(vote.getQuestion()));
+        } else {
+            voteDTO.setQuestion(null);
+        }
+
+        if(vote.getAnswer() != null){
+            voteDTO.setAnswer(AnswerDTO.ofEntity(vote.getAnswer()));
+        } else {
+            voteDTO.setAnswer(null);
+        }
+
         voteDTO.setUser(UserDTO.ofEntity(vote.getUser()));
         return voteDTO;
     }
@@ -25,8 +37,19 @@ public class VoteDTO {
         Vote vote = new Vote();
         vote.setId(voteDTO.getId());
         vote.setType(voteDTO.getType());
-        vote.setQuestion(QuestionDTO.toEntity(voteDTO.getQuestion()));
-        vote.setAnswer(AnswerDTO.toEntity(voteDTO.getAnswer()));
+
+        if(voteDTO.getQuestion() != null){
+            vote.setQuestion(QuestionDTO.toEntity(voteDTO.getQuestion()));
+        } else {
+            vote.setQuestion(null);
+        }
+
+        if(voteDTO.getAnswer() != null){
+            vote.setAnswer(AnswerDTO.toEntity(voteDTO.getAnswer()));
+        } else {
+            vote.setAnswer(null);
+        }
+
         vote.setUser(UserDTO.toEntity(voteDTO.getUser()));
         return vote;
     }

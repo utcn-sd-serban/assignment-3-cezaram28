@@ -1,14 +1,8 @@
-export function addQuestion(id, title, text, user, tags, creationDate, voteCount) {
+export function addQuestion(question) {
     return {
         type: "ADD_QUESTION",
         payload: {
-            id,
-            title,
-            text,
-            user,
-            creationDate,
-            voteCount,
-            tags
+            question
         }
     }
 }
@@ -20,6 +14,15 @@ export function editQuestion(id, title, text) {
             id,
             title,
             text
+        }
+    }
+}
+
+export function updateQuestion(question) {
+    return {
+        type: "UPDATE_QUESTION",
+        payload: {
+            question
         }
     }
 }
@@ -56,6 +59,16 @@ export function changeNewQuestionProperty(property, value) {
 export function loadQuestions(questions) {
     return {
         type: "LOAD_QUESTIONS",
+        payload: {
+            questions
+        }
+    }
+}
+
+export function searchQuestions(questions) {
+    debugger;
+    return {
+        type: "SEARCH_QUESTIONS",
         payload: {
             questions
         }

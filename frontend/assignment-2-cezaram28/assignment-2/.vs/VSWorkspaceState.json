@@ -3,12 +3,12 @@
     "",
     "\\src",
     "\\src\\model",
-    "\\src\\model\\question",
     "\\src\\model\\user",
     "\\src\\presenter",
     "\\src\\rest",
-    "\\src\\view"
+    "\\src\\view",
+    "\\src\\ws"
   ],
-  "SelectedNode": "\\src\\presenter\\questionsListPresenter.js",
+  "SelectedNode": "\\src\\App.js",
   "PreviewInSolutionExplorer": false
 }

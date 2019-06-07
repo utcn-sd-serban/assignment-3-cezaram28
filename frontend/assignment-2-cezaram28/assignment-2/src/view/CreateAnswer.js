@@ -26,11 +26,11 @@ const CreateAnswer = ({ user, text, question, onCreate, onChange, onLogout }) =>
             <div>
                 <div class="field">
                     <div class="control">
-                        <textarea value={text} onChange={e => onChange("text", e.target.value)} class="textarea is-primary" type="text" placeholder="Answer Text" />
+                        <textarea data-cy="text" value={text} onChange={e => onChange("text", e.target.value)} class="textarea is-primary" type="text" placeholder="Answer Text" />
                     </div>
                 </div>
                 <br />
-                <button class="button is-primary" onClick={() => onCreate(question)}>Add!</button>
+                <button data-cy="add" class="button is-primary" onClick={() => onCreate(question)}>Add!</button>
             </div>
         </div>
     </div>

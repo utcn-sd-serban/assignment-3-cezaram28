@@ -6,3 +6,12 @@ export function addTag(name) {
         }
     }
 }
+
+export function loadTags(tags) {
+    return {
+        type: "LOAD_TAGS",
+        payload: {
+            tags
+        }
+    }
+}

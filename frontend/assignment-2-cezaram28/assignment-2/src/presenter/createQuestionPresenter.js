@@ -6,8 +6,6 @@ import * as tagSelectors from "../model/tag/tagSelectors";
 import store from "../model/store/store";
 import RestClient from "../rest/RestClient";
 
-const client = new RestClient("user1", "pass1");
-
 class CreateQuestionPresenter {
 
     onLogout() {
@@ -18,11 +16,12 @@ class CreateQuestionPresenter {
     onCreate() {
         let newQuestion = questionSelectors.getNewQuestion();
         let tags = tagSelectors.toList(newQuestion.tags);
-        client.createQuestion(newQuestion.title, newQuestion.text, userSelectors.getCurrentUser(), tags)
-            .then(newQuestion => {
-                store.dispatch(questionActions.addQuestion(newQuestion.id, newQuestion.title, newQuestion.text, newQuestion.author,
-                    newQuestion.tags, newQuestion.creationDate, newQuestion.voteCount));
-            });
+
+        let user = userSelectors.getCurrentUser();
+        debugger;
+        const client = new RestClient(userSelectors.getCurrentUser().username, userSelectors.getCurrentUser().password);
+        client.createQuestion(newQuestion.title, userSelectors.getCurrentUser(), newQuestion.text, tags);
+
         store.dispatch(questionActions.changeNewQuestionProperty("title", ""));
         store.dispatch(questionActions.changeNewQuestionProperty("text", ""));
         store.dispatch(questionActions.changeNewQuestionProperty("tags", ""));

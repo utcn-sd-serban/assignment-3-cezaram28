@@ -1,22 +1,18 @@
 const initState = {
-    tags: [{
-        id: 0,
-        name: "java"
-    }, {
-        id: 1,
-        name: "programming"
-    }],
+    tags: [],
     newTag: {
         id: "",
         name: ""
     },
-    index: 2
+    index: 0
 };
 
 export default function tagReducer(state = initState, action) {
     switch (action.type) {
         case "ADD_TAG":
             return addTag(state, action.payload);
+        case "LOAD_TAGS":
+            return loadTags(state, action.payload);
     }
     return state;
 }
@@ -32,4 +28,11 @@ function addTag(state, payload) {
         tags: state.tags.concat([tag]),
         index: state.index + 1
     };
+}
+
+function loadTags(state, payload) {
+    return {
+        ...state,
+        tags: payload.tags
+    }
 }

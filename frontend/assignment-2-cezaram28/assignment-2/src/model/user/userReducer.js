@@ -1,30 +1,5 @@
-
 const initState = {
-    users: [{
-        id: 0,
-        username: "mckfchicken",
-        password: "burgr",
-        email: "mckfc@subway.com",
-        score: 5,
-        isAdmin: false,
-        isBanned: false
-    }, {
-        id: 1,
-        username: "admin_van_buuren",
-        password: "mixitup",
-        email: "avb@dj.com",
-        score: 1,
-        isAdmin: true,
-        isBanned: false
-    }, {
-        id: 2,
-        username: "user1",
-        password: "pass1",
-        email: "email1",
-        score: 0,
-        isAdmin: true,
-        isBanned: false
-    }],
+    users: [],
     newUser: {
         id: "",
         username: "",
@@ -34,8 +9,8 @@ const initState = {
         isAdmin: false,
         isBanned: false
     },
-    currentUserIndex: 2,
-    index: 2,
+    currentUserIndex: 0,
+    index: 3,
     route: "users-list"
 };
 
@@ -55,23 +30,39 @@ export default function userReducer(state = initState, action) {
             return logout(state, action.payload);
         case "UPDATE_CURRENT_INDEX":
             return updateCurrentUserIndex(state, action.payload);
+        case "UPDATE_USER":
+            return updateUser(state, action.payload);
+        case "LOAD_USERS":
+            return loadUsers(state, action.payload);
     }
     return state;
 };
 
 function addUser(state, payload) {
+
+    let users = state.users.filter(user => user.username === payload.user.username);
+    let newIndex;
+    let allUsers = [];
+    if (users.length === 0) {
+        allUsers = state.users.concat([payload.user]);
+        newIndex = allUsers.length - 1;
+    } else {
+        allUsers[users.indexOf(users[0])] = {
+            id: users[0].id,
+            username: users[0].username, 
+            password: payload.user.password !== undefined ? payload.user.password : "",
+            email: users[0].email,
+            score: users[0].score,
+            isAdmin: users[0].isAdmin,
+            isBanned: users[0].isBanned
+        }
+        newIndex = allUsers.indexOf(users[0]);
+    }
+    debugger;
     return {
         ...state,
-        users: state.users.concat([{
-            id: state.index,
-            username: payload.username,
-            password: payload.password,
-            email: payload.email,
-            score: 0,
-            isAdmin: false,
-            isBanned: false
-        }]),
-        index: state.index + 1
+        users: allUsers,
+        currentUserIndex: newIndex
     };
 }
 
@@ -104,17 +95,37 @@ function makeAdmin(state, payload) {
 }
 
 function banUser(state, payload) {
+    let user = state.users.filter(u => u.id === payload.id)[0];
     let currentUser = {
-        id: payload.id,
-        username: state.users[payload.id].username,
-        password: state.users[payload.id].password,
-        email: state.users[payload.id].email,
-        score: state.users[payload.id].score,
-        isAdmin: state.users[payload.id].isAdmin,
+        id: user.id,
+        username: user.username,
+        password: user.password,
+        email: user.email,
+        score: user.score,
+        isAdmin: user.isAdmin,
         isBanned: true
     };
     let allUsers = state.users.concat([]);
-    allUsers[payload.id] = currentUser;
+    allUsers[state.users.indexOf(user)] = currentUser;
+    return {
+        ...state,
+        users: allUsers
+    };
+}
+
+function updateUser(state, payload) {
+    let user = state.users.filter(u => u.id === payload.user.id)[0];
+    let currentUser = {
+        id: payload.user.id,
+        username: payload.user.username,
+        password: user.password,
+        email: user.email,
+        score: payload.user.score,
+        isAdmin: payload.user.isAdmin,
+        isBanned: payload.user.isBanned
+    };
+    let allUsers = state.users.concat([]);
+    allUsers[state.users.indexOf(user)] = currentUser;
     return {
         ...state,
         users: allUsers
@@ -147,8 +158,33 @@ function logout(state) {
 }
 
 function updateCurrentUserIndex(state, payload) {
+    let user = state.users.filter(u => u.id === payload.index)[0];
+    let index = state.users.indexOf(user);
     return {
         ...state,
-        currentUserIndex: payload.index
+        currentUserIndex: index
     };
+}
+
+function loadUsers(state, payload) {
+
+    let loggedUser = state.users[state.currentUserIndex];
+    let allUsers = [];
+    for (let i = 0; i < payload.users.length; i++) {
+        let filtered = state.users.filter(user => user.username === payload.users[i].username);
+        if (filtered.length === 0) {
+            allUsers.push(payload.users[i]);
+        } else {
+            allUsers.push(filtered[0]);
+        }
+        debugger;
+    }
+    
+    let index = allUsers.indexOf(loggedUser);
+    debugger;
+    return {
+        ...state,
+        users: allUsers,
+        currentUserIndex: index
+    }
 }

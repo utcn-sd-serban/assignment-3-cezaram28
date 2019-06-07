@@ -2,9 +2,10 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import createAnswerPresenter from "../presenter/createAnswerPresenter";
 import CreateAnswer from "./CreateAnswer";
+import { findById } from "../model/question/questionSelectors";
 
 const mapAnswerStateToComponentState = (state, props) => ({
-    question: state.questionState.questions[props.match.params.index],
+    question: findById(props.match.params.index),
     user: state.userState.users[state.userState.currentUserIndex],
     text: state.answerState.newAnswer.text
 });

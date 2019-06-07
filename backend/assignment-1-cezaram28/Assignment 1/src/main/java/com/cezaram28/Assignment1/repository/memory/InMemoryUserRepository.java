@@ -39,6 +39,11 @@ public class InMemoryUserRepository implements UserRepository{
     }
 
     @Override
+    public void deleteAll() {
+        data.clear();
+    }
+
+    @Override
     public Optional<User> findByName(String username) {
         for(User user:data.values()){
             if(user.getUsername().equals(username))

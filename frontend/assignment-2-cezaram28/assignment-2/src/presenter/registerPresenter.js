@@ -1,6 +1,7 @@
 import * as userActions from "../model/user/userActions";
 import * as userSelectors from "../model/user/userSelectors";
 import store from "../model/store/store";
+import RestClient from "../rest/RestClient";
 
 class RegisterPresenter {
 
@@ -10,22 +11,19 @@ class RegisterPresenter {
 
     onRegister() {
         let newUser = userSelectors.getNewUser();
-        let userByName = userSelectors.findByUsername(newUser.username);
-        if (userByName === undefined) {
-            let userByMail = userSelectors.findByEmail(newUser.email);
-            if (userByMail === undefined) {
+        const client = new RestClient("", "");
+
+        client.register(newUser.username, newUser.password, newUser.email).then(status => {
+            if (status >= 300) {
+                alert("User exists!");
+            } else {
                 store.dispatch(userActions.addUser(newUser.username, newUser.password, newUser.email));
-                store.dispatch(userActions.updateCurrentUserIndex(userSelectors.getIndex()));
-                window.location.assign("#/questions-list");
+                window.location.assign("#/login");
                 store.dispatch(userActions.changeNewUserProperty("username", ""));
                 store.dispatch(userActions.changeNewUserProperty("password", ""));
                 store.dispatch(userActions.changeNewUserProperty("email", ""));
-            } else {
-                alert("User exists!");
             }
-        } else {
-            alert("Username already exists!");
-        }
+        });
     }
 
     onChange(property, value) {

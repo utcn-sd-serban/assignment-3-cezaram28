@@ -26,15 +26,15 @@ const EditQuestion = ({ user, title, text, id, onEdit, onChange, onLogout }) => 
             <div>
                 <div class="field">
                     <div class="control">
-                        <input value={title} onChange={e => onChange("title", e.target.value)} class="input is-primary" type="title" placeholder="Question Title" />
+                        <input data-cy="title" value={title} onChange={e => onChange("title", e.target.value)} class="input is-primary" type="title" placeholder="Question Title" />
                     </div>
                 </div>
                 <div class="field">
                     <div class="control">
-                        <textarea value={text} onChange={e => onChange("text", e.target.value)} class="textarea is-primary" type="text" placeholder="Question Text" />
+                        <textarea data-cy="text" value={text} onChange={e => onChange("text", e.target.value)} class="textarea is-primary" type="text" placeholder="Question Text" />
                     </div>
                 </div>
-                <button class="button is-primary" onClick={() => onEdit(id)}>Edit!</button>
+                <button data-cy="edit" class="button is-primary" onClick={() => onEdit(id)}>Edit!</button>
             </div>
         </div>
     </div>

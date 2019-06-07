@@ -17,6 +17,11 @@ public class InMemoryQuestionRepository implements QuestionRepository {
     private final AtomicInteger currentId = new AtomicInteger(0);
 
     @Override
+    public void deleteAll() {
+        data.clear();
+    }
+
+    @Override
     public List<Question> findAll() {
         return new ArrayList<>(data.values());
     }

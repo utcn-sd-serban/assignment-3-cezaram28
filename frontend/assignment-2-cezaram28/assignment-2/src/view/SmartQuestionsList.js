@@ -30,9 +30,11 @@ class SmartQuestionsList extends Component {
     constructor() {
         super();
     }
-
+    
     componentDidMount() {
         questionsListPresenter.loadQuestions();
+        questionsListPresenter.loadTags();
+        questionsListPresenter.loadUsers();
     }
 
     render() {
